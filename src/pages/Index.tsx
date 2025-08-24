@@ -75,7 +75,7 @@ const Index = () => {
               <div className="text-center py-8">
                 <h2 className="text-2xl font-bold mb-2">Welcome to Your Feed</h2>
                 <p className="text-muted-foreground">
-                  Connect with Supabase to start chirping and join the conversation!
+                  Share your thoughts and join the conversation with our community!
                 </p>
               </div>
               
