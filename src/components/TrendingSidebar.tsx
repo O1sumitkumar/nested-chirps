@@ -1,7 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, Users, MoreHorizontal } from "lucide-react";
+import { TrendingUp, Users, MoreHorizontal, Verified } from "lucide-react";
+import techNewsAvatar from "@/assets/avatars/tech-news.jpg";
+import designInspirationAvatar from "@/assets/avatars/design-inspiration.jpg";
+import startupStoriesAvatar from "@/assets/avatars/startup-stories.jpg";
 
 const TrendingSidebar = () => {
   const trends = [
@@ -13,9 +16,9 @@ const TrendingSidebar = () => {
   ];
 
   const suggestions = [
-    { name: "Tech News", username: "technews", verified: true, followers: "1.2M" },
-    { name: "Design Inspiration", username: "designinspo", verified: false, followers: "850K" },
-    { name: "Startup Stories", username: "startupstories", verified: true, followers: "650K" },
+    { name: "Tech News", username: "technews", verified: true, followers: "1.2M", avatar: techNewsAvatar },
+    { name: "Design Inspiration", username: "designinspo", verified: false, followers: "850K", avatar: designInspirationAvatar },
+    { name: "Startup Stories", username: "startupstories", verified: true, followers: "650K", avatar: startupStoriesAvatar },
   ];
 
   return (
@@ -57,7 +60,7 @@ const TrendingSidebar = () => {
           {suggestions.map((user, index) => (
             <div key={index} className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src={`/placeholder-avatar-${index + 1}.jpg`} />
+                <AvatarImage src={user.avatar} />
                 <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
                   {user.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
@@ -65,7 +68,7 @@ const TrendingSidebar = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="font-semibold text-sm truncate">{user.name}</p>
-                  {user.verified && <div className="w-3 h-3 bg-primary rounded-full" />}
+                  {user.verified && <Verified className="w-3 h-3 text-primary fill-current" />}
                 </div>
                 <p className="text-muted-foreground text-sm">@{user.username}</p>
                 <p className="text-muted-foreground text-xs">{user.followers} followers</p>
