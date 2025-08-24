@@ -61,7 +61,7 @@ const TrendingSidebar = () => {
             <div key={index} className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarImage src={user.avatar} />
-                <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
+                <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
                   {user.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>

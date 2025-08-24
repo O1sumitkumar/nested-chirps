@@ -34,7 +34,7 @@ const ChirpCard = ({
       <div className="flex gap-3">
         <Avatar className="w-10 h-10">
           <AvatarImage src={author.avatar} />
-          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
+          <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
             {author.name.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -76,8 +76,8 @@ const ChirpCard = ({
               size="sm" 
               className={`h-8 gap-2 group ${
                 isRechirped 
-                  ? 'text-green-600 hover:bg-green-50' 
-                  : 'hover:bg-green-50 hover:text-green-600'
+                  ? 'text-accent hover:bg-accent/10' 
+                  : 'hover:bg-accent/10 hover:text-accent'
               }`}
             >
               <Repeat2 className="w-4 h-4 group-hover:fill-current" />
@@ -89,8 +89,8 @@ const ChirpCard = ({
               size="sm" 
               className={`h-8 gap-2 group ${
                 isLiked 
-                  ? 'text-red-500 hover:bg-red-50' 
-                  : 'hover:bg-red-50 hover:text-red-500'
+                  ? 'text-destructive hover:bg-destructive/10' 
+                  : 'hover:bg-destructive/10 hover:text-destructive'
               }`}
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : 'group-hover:fill-current'}`} />

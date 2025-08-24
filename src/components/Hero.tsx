@@ -25,7 +25,7 @@ const Hero = () => {
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
             Connect, Share, and{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="text-primary">
               Chirp
             </span>{" "}
             with the World
@@ -50,8 +50,8 @@ const Hero = () => {
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-6 mt-16">
             <Card className="p-6 bg-card/50 backdrop-blur border-primary/10 hover:border-primary/20 transition-all duration-300 hover:shadow-lg animate-scale-in" style={{ animationDelay: '0.3s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <MessageCircle className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <MessageCircle className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Real-time Conversations</h3>
               <p className="text-muted-foreground">
@@ -60,8 +60,8 @@ const Hero = () => {
             </Card>
             
             <Card className="p-6 bg-card/50 backdrop-blur border-accent/10 hover:border-accent/20 transition-all duration-300 hover:shadow-lg animate-scale-in" style={{ animationDelay: '0.4s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Hash className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Hash className="w-6 h-6 text-accent" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Trending Topics</h3>
               <p className="text-muted-foreground">
@@ -70,8 +70,8 @@ const Hero = () => {
             </Card>
             
             <Card className="p-6 bg-card/50 backdrop-blur border-primary/10 hover:border-primary/20 transition-all duration-300 hover:shadow-lg animate-scale-in" style={{ animationDelay: '0.5s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-glow to-accent rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Users className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-muted border border-border rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Users className="w-6 h-6 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Build Communities</h3>
               <p className="text-muted-foreground">
