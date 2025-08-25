@@ -41,13 +41,17 @@ All colors MUST be HSL.
     --input: 210 15% 93%;
     --ring: 217 32% 45%;
 
-    /* Design tokens - Subtle effects */
+    /* Design tokens - Glass effects and minimal shadows */
     --radius: 0.75rem;
+    --shadow-minimal: 0 2px 12px -2px hsl(215 25% 15% / 0.06);
     --shadow-elegant: 0 4px 20px -4px hsl(215 25% 15% / 0.08);
-    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.12);
+    --shadow-glass: 0 8px 32px -8px hsl(215 25% 15% / 0.12);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.15);
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--accent) / 0.05));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.03), hsl(var(--secondary)));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--background) / 0.8), hsl(var(--background) / 0.4));
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --backdrop-blur: blur(16px);
 
     --sidebar-background: 0 0% 98%;
 
@@ -115,5 +119,30 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Glass effect utilities */
+  .glass {
+    @apply bg-background/80 backdrop-blur-xl border border-border/50;
+  }
+
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-md border border-border/30;
+  }
+
+  .minimal-shadow {
+    box-shadow: var(--shadow-minimal);
+  }
+
+  .glass-shadow {
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Grid pattern for background */
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 }

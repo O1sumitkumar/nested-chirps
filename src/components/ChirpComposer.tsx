@@ -3,19 +3,69 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Image, Smile, MapPin, Calendar, MoreHorizontal } from "lucide-react";
+import { Image, Smile, MapPin, Calendar, MoreHorizontal, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useCreateChirp } from "@/hooks/useQuery";
+import { useToast } from "@/hooks/use-toast";
 
 const ChirpComposer = () => {
   const [chirpText, setChirpText] = useState("");
+  const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const createChirpMutation = useCreateChirp();
   const maxLength = 280;
 
+  const handleSubmit = async () => {
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to chirp",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!chirpText.trim()) return;
+
+    try {
+      await createChirpMutation.mutateAsync({
+        content: chirpText,
+        userId: user.id,
+      });
+      
+      setChirpText("");
+      toast({
+        title: "Chirp posted!",
+        description: "Your chirp has been shared with the world.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to post chirp",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <Card className="glass-card p-6 mb-6 text-center">
+        <p className="text-muted-foreground mb-4">Sign in to start chirping!</p>
+        <div className="flex gap-3 justify-center">
+          <Button variant="outline" size="sm">Sign In</Button>
+          <Button variant="hero" size="sm">Join ChirpNest</Button>
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="p-4 mb-6 border-border/50">
+    <Card className="glass-card p-4 mb-6 minimal-shadow">
       <div className="flex gap-3">
         <Avatar className="w-10 h-10">
-          <AvatarImage src="/placeholder-avatar.jpg" />
-          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
-            YU
+          <AvatarImage src={user.avatar} />
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            {user.name.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         
@@ -24,7 +74,7 @@ const ChirpComposer = () => {
             placeholder="What's chirping in your mind?"
             value={chirpText}
             onChange={(e) => setChirpText(e.target.value)}
-            className="min-h-[100px] resize-none border-none p-0 text-lg placeholder:text-muted-foreground focus-visible:ring-0"
+            className="min-h-[100px] resize-none border-none p-0 text-lg placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent"
             maxLength={maxLength}
           />
           
@@ -55,10 +105,15 @@ const ChirpComposer = () => {
               <Button 
                 variant="chirp" 
                 size="sm"
-                disabled={!chirpText.trim() || chirpText.length > maxLength}
+                disabled={!chirpText.trim() || chirpText.length > maxLength || createChirpMutation.isPending}
                 className="min-w-[80px]"
+                onClick={handleSubmit}
               >
-                Chirp
+                {createChirpMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Chirp"
+                )}
               </Button>
             </div>
           </div>
