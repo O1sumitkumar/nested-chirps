@@ -59,7 +59,7 @@ const Index = () => {
                   </div>
                 ) : chirpsData?.data?.length > 0 ? (
                   chirpsData.data.map((chirp: any, index: number) => (
-                    <ChirpCard key={chirp.id || index} {...chirp} />
+                    <ChirpCard key={chirp?._id || chirp?.id || index} {...chirp} />
                   ))
                 ) : (
                   // Fallback to sample data if API doesn't return data

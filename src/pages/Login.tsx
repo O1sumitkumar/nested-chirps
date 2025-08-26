@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLogin } from "@/hooks/useQuery";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
@@ -15,6 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const loginMutation = useLogin();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +25,12 @@ const Login = () => {
       const result = await loginMutation.mutateAsync({ email, password });
       
       if (result.success) {
-        localStorage.setItem('user', JSON.stringify(result.user));
+        if (result.user) {
+          login(result.user);
+        }
+        if (result.token) {
+          localStorage.setItem('token', result.token);
+        }
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in.",

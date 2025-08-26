@@ -84,7 +84,7 @@ const Explore = () => {
 
                 <TabsContent value="chirps" className="space-y-4">
                   {searchChirps?.data?.map((chirp: any, index: number) => (
-                    <ChirpCard key={index} {...chirp} />
+                    <ChirpCard key={chirp?._id || chirp?.id || index} {...chirp} />
                   )) || (
                     <Card className="glass-card p-8 text-center">
                       <p className="text-muted-foreground">No chirps found for "{activeSearch}"</p>

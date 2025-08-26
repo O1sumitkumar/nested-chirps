@@ -15,13 +15,15 @@ export interface ApiResponse<T = any> {
 
 export const queryApi = async <T = any>(request: QueryRequest): Promise<T> => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(API_BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        dbUrl: 'i-will-add-later',
+        dbUrl: 'mongodb://localhost:27017/chirps',
         dbType: 'mongodb',
         ...request,
       }),
@@ -40,29 +42,54 @@ export const queryApi = async <T = any>(request: QueryRequest): Promise<T> => {
 };
 
 // Specific query functions
-export const getChirps = () => 
-  queryApi({ query: "Get all recent chirps with user details, ordered by created date" });
+export const getChirps = () =>
+  queryApi({ query: "Get all recent Chirps post, ordered by created date" });
 
-export const getTrendingTopics = () => 
+export const getTrendingTopics = () =>
   queryApi({ query: "Get trending hashtags and topics with engagement metrics" });
 
-export const getUser = (username: string) => 
+export const getUser = (username: string) =>
   queryApi({ query: `Get user profile for username: ${username}` });
 
-export const createChirp = (content: string, userId: string) => 
+export const createChirp = (content: string, userId: string) =>
   queryApi({ query: `Create new chirp with content: "${content}" for user: ${userId}` });
 
-export const authenticateUser = (email: string, password: string) => 
-  queryApi({ query: `Authenticate user with email: ${email} and password: ${password}` });
+export const authenticateUser = async (email: string, password: string) => {
+  try {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-export const registerUser = (email: string, password: string, username: string, name: string) => 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      ...data,
+      success: typeof data?.success !== 'undefined' ? Boolean(data.success) : true,
+      user: data?.user ?? data?.data?.user ?? null,
+      token: data?.token ?? data?.data?.token ?? undefined,
+      message: data?.message ?? data?.error ?? undefined,
+    };
+  } catch (error) {
+    console.error('Login request failed:', error);
+    throw error;
+  }
+};
+
+export const registerUser = (email: string, password: string, username: string, name: string) =>
   queryApi({ query: `Register new user with email: ${email}, username: ${username}, name: ${name}, password: ${password}` });
 
-export const getWhoToFollow = () => 
+export const getWhoToFollow = () =>
   queryApi({ query: "Get suggested users to follow based on activity and interests" });
 
-export const searchUsers = (searchTerm: string) => 
+export const searchUsers = (searchTerm: string) =>
   queryApi({ query: `Search for users matching: ${searchTerm}` });
 
-export const searchChirps = (searchTerm: string) => 
+export const searchChirps = (searchTerm: string) =>
   queryApi({ query: `Search chirps containing: ${searchTerm}` });
