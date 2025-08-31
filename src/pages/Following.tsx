@@ -5,12 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, Verified } from "lucide-react";
 import { useFollowing, useFollowUser, useUnfollowUser } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useState } from "react";
 
 const Following = () => {
   const { userId } = useParams<{ userId: string }>();
-  const { user: currentUser, isAuthenticated } = useAuth();
+  const currentUser = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const [followingStates, setFollowingStates] = useState<Record<string, boolean>>({});
 
   const { data: followingData, isLoading } = useFollowing(userId!);

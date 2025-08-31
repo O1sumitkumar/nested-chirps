@@ -3,15 +3,45 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Search, Bell, MessageCircle, Users, Home, Hash, BookmarkCheck, User, Settings, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { selectIsAuthenticated, selectCurrentUser } from "@/store/selectors";
+import { logout } from "@/store/slices/authSlice";
 
 const Header = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const user = useAppSelector(selectCurrentUser);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Debug logging
+  console.log('Header: Auth state', { isAuthenticated, user: !!user, userName: user?.name });
+
+  // Helper function to check if a path is active
+  const isActivePath = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  // Helper function to get button variant based on active state
+  const getButtonVariant = (path: string) => {
+    return isActivePath(path) ? "secondary" : "ghost";
+  };
+
+  // Helper function to get button classes based on active state
+  const getButtonClasses = (path: string) => {
+    const baseClasses = "gap-2 transition-all duration-200";
+    if (isActivePath(path)) {
+      return `${baseClasses} bg-primary/10 text-primary border-primary/20 font-medium`;
+    }
+    return `${baseClasses} hover:bg-primary/10`;
+  };
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/');
   };
 
@@ -32,39 +62,45 @@ const Header = () => {
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center gap-1">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+              <Button variant={getButtonVariant('/')} size="sm" className={getButtonClasses('/')}>
                 <Home className="w-4 h-4" />
                 <span>Home</span>
               </Button>
             </Link>
             <Link to="/explore">
-              <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+              <Button variant={getButtonVariant('/explore')} size="sm" className={getButtonClasses('/explore')}>
                 <Hash className="w-4 h-4" />
                 <span>Explore</span>
               </Button>
             </Link>
             {isAuthenticated && (
               <>
+                <Link to={`/profile/${user?.id}`}>
+                  <Button variant={getButtonVariant('/profile')} size="sm" className={getButtonClasses('/profile')}>
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                  </Button>
+                </Link>
                 <Link to="/notifications">
-                  <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+                  <Button variant={getButtonVariant('/notifications')} size="sm" className={getButtonClasses('/notifications')}>
                     <Bell className="w-4 h-4" />
                     <span>Notifications</span>
                   </Button>
                 </Link>
                 <Link to="/messages">
-                  <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+                  <Button variant={getButtonVariant('/messages')} size="sm" className={getButtonClasses('/messages')}>
                     <MessageCircle className="w-4 h-4" />
                     <span>Messages</span>
                   </Button>
                 </Link>
                 <Link to="/bookmarks">
-                  <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+                  <Button variant={getButtonVariant('/bookmarks')} size="sm" className={getButtonClasses('/bookmarks')}>
                     <BookmarkCheck className="w-4 h-4" />
                     <span>Bookmarks</span>
                   </Button>
                 </Link>
                 <Link to="/communities">
-                  <Button variant="ghost" size="sm" className="gap-2 hover:bg-primary/10">
+                  <Button variant={getButtonVariant('/communities')} size="sm" className={getButtonClasses('/communities')}>
                     <Users className="w-4 h-4" />
                     <span>Communities</span>
                   </Button>

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { MessageCircle, Eye, EyeOff, Loader2, Check } from "lucide-react";
-import { useRegister } from "@/hooks/useQuery";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { registerUserAsync, selectIsLoading, selectAuthError, clearError } from "@/store/slices/authSlice";
 import { useToast } from "@/hooks/use-toast";
 import authBg from "@/assets/auth-bg.jpg";
 
@@ -19,9 +20,22 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const registerMutation = useRegister();
+  const isLoading = useAppSelector(selectIsLoading);
+  const error = useAppSelector(selectAuthError);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Registration failed",
+        description: error,
+        variant: "destructive",
+      });
+      dispatch(clearError());
+    }
+  }, [error, toast, dispatch]);
 
   const validatePassword = (password: string) => {
     let strength = 0;
@@ -35,7 +49,7 @@ const Signup = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     if (field === 'password') {
       setPasswordStrength(validatePassword(value));
     }
@@ -43,7 +57,7 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Password mismatch",
@@ -61,34 +75,22 @@ const Signup = () => {
       });
       return;
     }
-    
+
     try {
-      const result = await registerMutation.mutateAsync({
+      await dispatch(registerUserAsync({
         name: formData.name,
         username: formData.username,
         email: formData.email,
         password: formData.password,
-      });
-      
-      if (result.success || result.data) {
-        toast({
-          title: "Account created!",
-          description: "Welcome to ChirpNest! Please sign in.",
-        });
-        navigate('/login');
-      } else {
-        toast({
-          title: "Registration failed",
-          description: result.message || "Please try again",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
+      })).unwrap();
+
       toast({
-        title: "Registration failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+        title: "Account created!",
+        description: "Welcome to ChirpNest! Please sign in.",
       });
+      navigate('/login');
+    } catch (error) {
+      // Error is handled by useEffect above
     }
   };
 
@@ -105,7 +107,7 @@ const Signup = () => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
         backgroundImage: `url(${authBg})`,
@@ -116,7 +118,7 @@ const Signup = () => {
     >
       {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-background/60 backdrop-blur-sm"></div>
-      
+
       <div className="w-full max-w-md relative z-10">
         {/* Glass Card */}
         <Card className="glass backdrop-blur-xl border-border/30 minimal-shadow">
@@ -134,7 +136,7 @@ const Signup = () => {
               Join the conversation and start chirping today
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -149,7 +151,7 @@ const Signup = () => {
                     className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
                   <Input
@@ -162,7 +164,7 @@ const Signup = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -175,7 +177,7 @@ const Signup = () => {
                   className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -196,12 +198,12 @@ const Signup = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                
+
                 {formData.password && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
                           style={{ width: `${(passwordStrength / 5) * 100}%` }}
                         />
@@ -213,7 +215,7 @@ const Signup = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
@@ -231,13 +233,13 @@ const Signup = () => {
                   )}
                 </div>
               </div>
-              
-              <Button 
-                type="submit" 
+
+              <Button
+                type="submit"
                 className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-                disabled={registerMutation.isPending}
+                disabled={isLoading}
               >
-                {registerMutation.isPending ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Creating account...
@@ -247,7 +249,7 @@ const Signup = () => {
                 )}
               </Button>
             </form>
-            
+
             <div className="text-center">
               <div className="text-sm text-muted-foreground">
                 Already have an account?{" "}

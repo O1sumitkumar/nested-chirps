@@ -1,16 +1,19 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Image, Smile, MapPin, Calendar, MoreHorizontal, Loader2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectIsAuthenticated, selectCurrentUser } from "@/store/selectors";
 import { useCreateChirp } from "@/hooks/useQuery";
 import { useToast } from "@/hooks/use-toast";
 
 const ChirpComposer = () => {
   const [chirpText, setChirpText] = useState("");
-  const { user, isAuthenticated } = useAuth();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const user = useAppSelector(selectCurrentUser);
   const { toast } = useToast();
   const createChirpMutation = useCreateChirp();
   const maxLength = 280;
@@ -47,13 +50,17 @@ const ChirpComposer = () => {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return (
       <Card className="glass-card p-6 mb-6 text-center">
         <p className="text-muted-foreground mb-4">Sign in to start chirping!</p>
         <div className="flex gap-3 justify-center">
-          <Button variant="outline" size="sm">Sign In</Button>
-          <Button variant="hero" size="sm">Join ChirpNest</Button>
+          <Link to="/login">
+            <Button variant="outline" size="sm">Sign In</Button>
+          </Link>
+          <Link to="/signup">
+            <Button variant="hero" size="sm">Join ChirpNest</Button>
+          </Link>
         </div>
       </Card>
     );
@@ -63,9 +70,9 @@ const ChirpComposer = () => {
     <Card className="glass-card p-4 mb-6 minimal-shadow">
       <div className="flex gap-3">
         <Avatar className="w-10 h-10">
-          <AvatarImage src={user.avatar} />
+          <AvatarImage src={user?.avatar} />
           <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-            {user.name.slice(0, 2).toUpperCase()}
+            {user?.name ? user.name.slice(0, 2).toUpperCase() : 'AN'}
           </AvatarFallback>
         </Avatar>
         

@@ -4,7 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Repeat2, UserPlus, Bell } from "lucide-react";
 import { useNotifications } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { Link } from "react-router-dom";
 
 const NotificationIcon = ({ type }: { type: string }) => {
@@ -23,7 +24,8 @@ const NotificationIcon = ({ type }: { type: string }) => {
 };
 
 const Notifications = () => {
-  const { user, isAuthenticated } = useAuth();
+  const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { data: notificationsData, isLoading } = useNotifications(user?.id || '');
 
   const notifications = notificationsData?.data || [];

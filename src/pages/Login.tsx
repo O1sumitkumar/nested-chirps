@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
-import { useLogin } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginUser, selectIsLoading, selectAuthError, clearError } from "@/store/slices/authSlice";
 import { useToast } from "@/hooks/use-toast";
 import authBg from "@/assets/auth-bg.jpg";
 
@@ -14,42 +14,40 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
-  const loginMutation = useLogin();
-  const { login } = useAuth();
+  const isLoading = useAppSelector(selectIsLoading);
+  const error = useAppSelector(selectAuthError);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Login failed",
+        description: error,
+        variant: "destructive",
+      });
+      dispatch(clearError());
+    }
+  }, [error, toast, dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const result = await loginMutation.mutateAsync({ email, password });
+      const result = await dispatch(loginUser({ email, password })).unwrap();
       
-      if (result.success) {
-        if (result.user) {
-          login(result.user);
-        }
-        if (result.token) {
-          localStorage.setItem('token', result.token);
-        }
-        toast({
-          title: "Welcome back!",
-          description: "You've successfully logged in.",
-        });
-        navigate('/');
-      } else {
-        toast({
-          title: "Login failed",
-          description: result.message || "Invalid credentials",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
       toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
+        title: "Welcome back!",
+        description: "You've successfully logged in.",
       });
+      
+      // Redirect to the page they were trying to access, or home
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    } catch (error) {
+      // Error is handled by useEffect above
     }
   };
 
@@ -124,9 +122,9 @@ const Login = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-                disabled={loginMutation.isPending}
+                disabled={isLoading}
               >
-                {loginMutation.isPending ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Signing in...

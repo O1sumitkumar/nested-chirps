@@ -8,12 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, MessageCircle, Heart, Repeat2, Share, Loader2 } from "lucide-react";
 import { useChirpDetail, useReplyToChirp } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useToast } from "@/hooks/use-toast";
 
 const ChirpDetail = () => {
   const { chirpId } = useParams<{ chirpId: string }>();
-  const { user, isAuthenticated } = useAuth();
+  const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { toast } = useToast();
   const [replyText, setReplyText] = useState("");
 

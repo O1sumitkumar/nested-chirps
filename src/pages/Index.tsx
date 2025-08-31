@@ -4,11 +4,12 @@ import ChirpComposer from "@/components/ChirpComposer";
 import ChirpCard from "@/components/ChirpCard";
 import TrendingSidebar from "@/components/TrendingSidebar";
 import { useChirps } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectIsAuthenticated } from "@/store/selectors";
 
 const Index = () => {
   const { data: chirpsData, isLoading, error } = useChirps();
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   return (
     <div className="min-h-screen bg-background">

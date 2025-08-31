@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Verified, Edit, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLikeChirp, useUnlikeChirp, useRechirp, useUnrechirp, useDeleteChirp } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useToast } from "@/hooks/use-toast";
 
 interface ChirpCardProps {
@@ -68,7 +69,8 @@ const ChirpCard = ({
   isVerified,
   createdAt,
 }: ChirpCardProps) => {
-  const { user, isAuthenticated } = useAuth();
+  const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { toast } = useToast();
   const [isLikedState, setIsLikedState] = useState(isLiked);
   const [isRechirpedState, setIsRechirpedState] = useState(isRechirped);

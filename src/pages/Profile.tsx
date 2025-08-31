@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, MapPin, Link2, MoreHorizontal, ArrowLeft, Verified } from "lucide-react";
 import { useUserProfile, useUserChirps, useFollowUser, useUnfollowUser, useFollowers, useFollowing } from "@/hooks/useQuery";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
-  const { user: currentUser, isAuthenticated } = useAuth();
+  const currentUser = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { toast } = useToast();
   const [isFollowing, setIsFollowing] = useState(false);
 

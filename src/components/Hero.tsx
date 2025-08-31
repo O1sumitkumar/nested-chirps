@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MessageCircle, Users, Hash, Zap } from "lucide-react";
@@ -37,14 +38,18 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <Button variant="hero" size="lg" className="text-lg px-8 py-6">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Start Chirping
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 hover:bg-primary/5">
-              <Users className="w-5 h-5 mr-2" />
-              Explore Communities
-            </Button>
+            <Link to="/signup">
+              <Button variant="hero" size="lg" className="text-lg px-8 py-6">
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Start Chirping
+              </Button>
+            </Link>
+            <Link to="/explore">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 hover:bg-primary/5">
+                <Users className="w-5 h-5 mr-2" />
+                Explore Communities
+              </Button>
+            </Link>
           </div>
           
           {/* Feature Cards */}
