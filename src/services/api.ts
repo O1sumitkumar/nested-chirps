@@ -93,3 +93,56 @@ export const searchUsers = (searchTerm: string) =>
 
 export const searchChirps = (searchTerm: string) =>
   queryApi({ query: `Search chirps containing: ${searchTerm}` });
+
+// Chirp interactions
+export const likeChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `Like chirp ${chirpId} by user ${userId}` });
+
+export const unlikeChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `Unlike chirp ${chirpId} by user ${userId}` });
+
+export const rechirpChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `Retweet chirp ${chirpId} by user ${userId}` });
+
+export const unrechirpChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `Remove retweet of chirp ${chirpId} by user ${userId}` });
+
+export const replyToChirp = (chirpId: string, content: string, userId: string) =>
+  queryApi({ query: `Reply to chirp ${chirpId} with content: "${content}" by user ${userId}` });
+
+export const deleteChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `Delete chirp ${chirpId} by user ${userId}` });
+
+export const updateChirp = (chirpId: string, content: string, userId: string) =>
+  queryApi({ query: `Update chirp ${chirpId} with new content: "${content}" by user ${userId}` });
+
+// User profile and relationships
+export const getUserProfile = (userId: string) =>
+  queryApi({ query: `Get detailed user profile for user ID: ${userId}` });
+
+export const updateUserProfile = (userId: string, profileData: any) =>
+  queryApi({ query: `Update user profile for ${userId} with data: ${JSON.stringify(profileData)}` });
+
+export const followUser = (followerId: string, followeeId: string) =>
+  queryApi({ query: `User ${followerId} follows user ${followeeId}` });
+
+export const unfollowUser = (followerId: string, followeeId: string) =>
+  queryApi({ query: `User ${followerId} unfollows user ${followeeId}` });
+
+export const getFollowers = (userId: string) =>
+  queryApi({ query: `Get all followers of user ${userId}` });
+
+export const getFollowing = (userId: string) =>
+  queryApi({ query: `Get all users that user ${userId} is following` });
+
+export const getUserChirps = (userId: string) =>
+  queryApi({ query: `Get all chirps posted by user ${userId} ordered by date` });
+
+export const getChirpDetail = (chirpId: string) =>
+  queryApi({ query: `Get detailed chirp information for chirp ${chirpId} including replies` });
+
+export const getNotifications = (userId: string) =>
+  queryApi({ query: `Get notifications for user ${userId} including likes, follows, replies` });
+
+export const markNotificationRead = (notificationId: string) =>
+  queryApi({ query: `Mark notification ${notificationId} as read` });

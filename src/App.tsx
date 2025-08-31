@@ -8,6 +8,11 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Explore from "./pages/Explore";
+import Profile from "./pages/Profile";
+import ChirpDetail from "./pages/ChirpDetail";
+import Followers from "./pages/Followers";
+import Following from "./pages/Following";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +29,11 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/explore" element={<Explore />} />
-            <Route path="/notifications" element={<Index />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/profile/:userId/followers" element={<Followers />} />
+            <Route path="/profile/:userId/following" element={<Following />} />
+            <Route path="/chirp/:chirpId" element={<ChirpDetail />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/messages" element={<Index />} />
             <Route path="/bookmarks" element={<Index />} />
             <Route path="/communities" element={<Index />} />

@@ -8,7 +8,23 @@ import {
   registerUser,
   getWhoToFollow,
   searchUsers,
-  searchChirps
+  searchChirps,
+  likeChirp,
+  unlikeChirp,
+  rechirpChirp,
+  unrechirpChirp,
+  replyToChirp,
+  deleteChirp,
+  updateChirp,
+  getUserProfile,
+  updateUserProfile,
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+  getUserChirps,
+  getChirpDetail,
+  getNotifications
 } from '@/services/api';
 
 // Chirps
@@ -92,5 +108,168 @@ export const useSearchChirps = (searchTerm: string) => {
     queryKey: ['searchChirps', searchTerm],
     queryFn: () => searchChirps(searchTerm),
     enabled: searchTerm.length > 2,
+  });
+};
+
+// Chirp interactions
+export const useLikeChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      likeChirp(chirpId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useUnlikeChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      unlikeChirp(chirpId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useRechirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      rechirpChirp(chirpId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useUnrechirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      unrechirpChirp(chirpId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useReplyToChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, content, userId }: { chirpId: string; content: string; userId: string }) => 
+      replyToChirp(chirpId, content, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useDeleteChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      deleteChirp(chirpId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+export const useUpdateChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, content, userId }: { chirpId: string; content: string; userId: string }) => 
+      updateChirp(chirpId, content, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chirps'] });
+    },
+  });
+};
+
+// User profile hooks
+export const useUserProfile = (userId: string) => {
+  return useQuery({
+    queryKey: ['userProfile', userId],
+    queryFn: () => getUserProfile(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, profileData }: { userId: string; profileData: any }) => 
+      updateUserProfile(userId, profileData),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
+    },
+  });
+};
+
+export const useFollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ followerId, followeeId }: { followerId: string; followeeId: string }) => 
+      followUser(followerId, followeeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['followers'] });
+      queryClient.invalidateQueries({ queryKey: ['following'] });
+    },
+  });
+};
+
+export const useUnfollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ followerId, followeeId }: { followerId: string; followeeId: string }) => 
+      unfollowUser(followerId, followeeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['followers'] });
+      queryClient.invalidateQueries({ queryKey: ['following'] });
+    },
+  });
+};
+
+export const useFollowers = (userId: string) => {
+  return useQuery({
+    queryKey: ['followers', userId],
+    queryFn: () => getFollowers(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useFollowing = (userId: string) => {
+  return useQuery({
+    queryKey: ['following', userId],
+    queryFn: () => getFollowing(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useUserChirps = (userId: string) => {
+  return useQuery({
+    queryKey: ['userChirps', userId],
+    queryFn: () => getUserChirps(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useChirpDetail = (chirpId: string) => {
+  return useQuery({
+    queryKey: ['chirpDetail', chirpId],
+    queryFn: () => getChirpDetail(chirpId),
+    enabled: !!chirpId,
+  });
+};
+
+export const useNotifications = (userId: string) => {
+  return useQuery({
+    queryKey: ['notifications', userId],
+    queryFn: () => getNotifications(userId),
+    enabled: !!userId,
+    refetchInterval: 60000, // Refetch every minute
   });
 };
