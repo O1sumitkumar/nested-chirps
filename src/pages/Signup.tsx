@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { MessageCircle, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { useRegister } from "@/hooks/useQuery";
 import { useToast } from "@/hooks/use-toast";
+import authBg from "@/assets/auth-bg.jpg";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -69,7 +70,7 @@ const Signup = () => {
         password: formData.password,
       });
       
-      if (result.success) {
+      if (result.success || result.data) {
         toast({
           title: "Account created!",
           description: "Welcome to ChirpNest! Please sign in.",
@@ -104,13 +105,21 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `url(${authBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm"></div>
       
-      <div className="w-full max-w-md relative">
+      <div className="w-full max-w-md relative z-10">
         {/* Glass Card */}
-        <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl shadow-primary/10">
+        <Card className="glass backdrop-blur-xl border-border/30 minimal-shadow">
           <CardHeader className="text-center space-y-4">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">

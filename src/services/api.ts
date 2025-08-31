@@ -82,8 +82,33 @@ export const authenticateUser = async (email: string, password: string) => {
   }
 };
 
-export const registerUser = (email: string, password: string, username: string, name: string) =>
-  queryApi({ query: `Register new user with email: ${email}, username: ${username}, name: ${name}, password: ${password}` });
+export const registerUser = async (email: string, password: string, username: string, name: string) => {
+  try {
+    const response = await fetch('http://localhost:3000/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, username, name }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      ...data,
+      success: typeof data?.success !== 'undefined' ? Boolean(data.success) : true,
+      user: data?.user ?? data?.data?.user ?? null,
+      token: data?.token ?? data?.data?.token ?? undefined,
+      message: data?.message ?? data?.error ?? undefined,
+    };
+  } catch (error) {
+    console.error('Registration request failed:', error);
+    throw error;
+  }
+};
 
 export const getWhoToFollow = () =>
   queryApi({ query: "Get suggested users to follow based on activity and interests" });

@@ -38,7 +38,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check for existing user session on app load
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token');
+    
+    if (storedUser && storedToken) {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
@@ -46,6 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (error) {
         console.error('Error parsing stored user data:', error);
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
     }
   }, []);
@@ -60,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('token'); // Also remove the auth token
   };
 
   const updateUser = (userData: Partial<User>) => {
