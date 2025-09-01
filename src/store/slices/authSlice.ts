@@ -8,6 +8,10 @@ export interface User {
   email: string;
   avatar?: string;
   verified?: boolean;
+  bio?: string;
+  location?: string;
+  website?: string;
+  joinedDate?: string;
 }
 
 export interface AuthState {
@@ -27,22 +31,24 @@ const initialState: AuthState = {
 };
 
 // Async thunks for authentication
-export const loginUser = createAsyncThunk(
+export const loginUser = createAsyncThunk<
+  { user: User; token: string },
+  { email: string; password: string },
+  { rejectValue: string }
+>(
   'auth/loginUser',
-  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+  async (credentials, { rejectWithValue }) => {
     try {
       const response = await authenticateUser(credentials.email, credentials.password);
 
-      if (!response.success) {
+      if (!response.success || !response.data || !response.token) {
         return rejectWithValue(response.message || 'Login failed');
       }
 
       console.log('Login response:', response);
 
       // Store token in localStorage
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-      }
+      localStorage.setItem('token', response.token);
 
       return {
         user: response.data,
@@ -54,12 +60,13 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const registerUserAsync = createAsyncThunk(
+export const registerUserAsync = createAsyncThunk<
+  { user: User; token: string },
+  { email: string; password: string; username: string; name: string },
+  { rejectValue: string }
+>(
   'auth/registerUser',
-  async (
-    userData: { email: string; password: string; username: string; name: string },
-    { rejectWithValue }
-  ) => {
+  async (userData, { rejectWithValue }) => {
     try {
       const response = await registerUser(
         userData.email,
@@ -68,9 +75,10 @@ export const registerUserAsync = createAsyncThunk(
         userData.name
       );
 
-      if (!response.success) {
+      if (!response.success || !response.data || !response.token) {
         return rejectWithValue(response.message || 'Registration failed');
       }
+      
       console.log('Registration response:', response);
       return {
         user: response.data,
@@ -82,7 +90,11 @@ export const registerUserAsync = createAsyncThunk(
   }
 );
 
-export const initializeAuth = createAsyncThunk(
+export const initializeAuth = createAsyncThunk<
+  { user: User; token: string } | null,
+  void,
+  { rejectValue: string }
+>(
   'auth/initializeAuth',
   async (_, { rejectWithValue }) => {
     try {
@@ -92,7 +104,7 @@ export const initializeAuth = createAsyncThunk(
       console.log('InitializeAuth: Stored data', { storedUser, storedToken });
 
       if (storedUser && storedToken) {
-        const userData = JSON.parse(storedUser);
+        const userData = JSON.parse(storedUser) as User;
         console.log('InitializeAuth: Parsed user data', userData);
 
         // Validate user data structure

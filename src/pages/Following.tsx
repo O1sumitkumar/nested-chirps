@@ -3,7 +3,8 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Verified } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import VerifiedBadge from "@/components/VerifiedBadge";
 import { useFollowing, useFollowUser, useUnfollowUser } from "@/hooks/useQuery";
 import { useAppSelector } from "@/store/hooks";
 import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
@@ -109,7 +110,7 @@ const Following = () => {
                               <h3 className="font-semibold text-foreground truncate">{user.name || user.username}</h3>
                             </Link>
                             {user.verified && (
-                              <Verified className="w-4 h-4 text-primary fill-current" />
+                              <VerifiedBadge className="w-5 h-5" />
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">@{user.username}</p>

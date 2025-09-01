@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Verified, Edit, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import VerifiedBadge from "@/components/VerifiedBadge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLikeChirp, useUnlikeChirp, useRechirp, useUnrechirp, useDeleteChirp } from "@/hooks/useQuery";
 import { useAppSelector } from "@/store/hooks";
 import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useToast } from "@/hooks/use-toast";
+import { formatChirpDate } from "@/lib/utils";
 
 interface ChirpCardProps {
   // New schema fields
@@ -51,7 +53,7 @@ interface ChirpCardProps {
   isRechirped?: boolean;
 }
 
-const ChirpCard = ({ 
+const ChirpCard = ({
   _id,
   userId,
   author,
@@ -158,7 +160,7 @@ const ChirpCard = ({
             </AvatarFallback>
           </Avatar>
         </Link>
-        
+
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-center gap-2 mb-1">
@@ -166,11 +168,11 @@ const ChirpCard = ({
               <h3 className="font-semibold text-foreground truncate">{displayNameResolved}</h3>
             </Link>
             {verifiedResolved && (
-              <Verified className="w-4 h-4 text-primary fill-current" />
+              <VerifiedBadge className="w-5 h-5" />
             )}
             <span className="text-muted-foreground text-sm">@{usernameResolved}</span>
-            <span className="text-muted-foreground text-sm">·</span>
-            <span className="text-muted-foreground text-sm">{timestampResolved}</span>
+            <span className="text-muted-foreground text-sm">•</span>
+            <span className="text-muted-foreground text-sm">{formatChirpDate(timestampResolved)}</span>
             <div className="flex-1" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -185,7 +187,7 @@ const ChirpCard = ({
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       className="cursor-pointer text-destructive"
                       onClick={handleDelete}
                       disabled={deleteMutation.isPending}
@@ -198,58 +200,56 @@ const ChirpCard = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
+
           {/* Content */}
           <Link to={`/chirp/${chirpId}`} className="block mb-3 cursor-pointer">
             <p className="text-foreground leading-relaxed hover:text-foreground/80">{content ?? ''}</p>
           </Link>
-          
+
           {/* Actions */}
           <div className="flex items-center justify-between max-w-md">
             <Link to={`/chirp/${chirpId}`}>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="h-8 gap-2 hover:bg-primary/10 hover:text-primary group"
               >
                 <MessageCircle className="w-4 h-4 group-hover:fill-current" />
                 <span className="text-sm">{repliesResolved > 0 ? repliesResolved : ''}</span>
               </Button>
             </Link>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`h-8 gap-2 group ${
-                isRechirpedState 
-                  ? 'text-accent hover:bg-accent/10' 
-                  : 'hover:bg-accent/10 hover:text-accent'
-              }`}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 gap-2 group ${isRechirpedState
+                ? 'text-accent hover:bg-accent/10'
+                : 'hover:bg-accent/10 hover:text-accent'
+                }`}
               onClick={handleRechirp}
               disabled={rechirpMutation.isPending || unrechirpMutation.isPending}
             >
               <Repeat2 className="w-4 h-4 group-hover:fill-current" />
               <span className="text-sm">{rechirpsCount > 0 ? rechirpsCount : ''}</span>
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`h-8 gap-2 group ${
-                isLikedState 
-                  ? 'text-destructive hover:bg-destructive/10' 
-                  : 'hover:bg-destructive/10 hover:text-destructive'
-              }`}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 gap-2 group ${isLikedState
+                ? 'text-destructive hover:bg-destructive/10'
+                : 'hover:bg-destructive/10 hover:text-destructive'
+                }`}
               onClick={handleLike}
               disabled={likeMutation.isPending || unlikeMutation.isPending}
             >
               <Heart className={`w-4 h-4 ${isLikedState ? 'fill-current' : 'group-hover:fill-current'}`} />
               <span className="text-sm">{likesCount > 0 ? likesCount : ''}</span>
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
+
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-8 gap-2 hover:bg-primary/10 hover:text-primary group"
             >
               <Share className="w-4 h-4" />

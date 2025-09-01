@@ -5,9 +5,9 @@ import ChirpCard from "@/components/ChirpCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, MapPin, Link2, MoreHorizontal, ArrowLeft, Verified } from "lucide-react";
+import { CalendarDays, MapPin, Link2, MoreHorizontal, ArrowLeft } from "lucide-react";
+import VerifiedBadge from "@/components/VerifiedBadge";
 import { useUserProfile, useUserChirps, useFollowUser, useUnfollowUser, useFollowers, useFollowing } from "@/hooks/useQuery";
 import { useAppSelector } from "@/store/hooks";
 import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
@@ -20,7 +20,12 @@ const Profile = () => {
   const { toast } = useToast();
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const { data: profileData, isLoading: profileLoading } = useUserProfile(userId!);
+  const isOwnProfile = currentUser?.id === userId;
+
+  // Only fetch profile data if it's not the current user's profile
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(userId!, {
+    enabled: !isOwnProfile && !!userId,
+  });
   const { data: chirpsData, isLoading: chirpsLoading } = useUserChirps(userId!);
   const { data: followersData } = useFollowers(userId!);
   const { data: followingData } = useFollowing(userId!);
@@ -28,12 +33,14 @@ const Profile = () => {
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
 
-  const profile = profileData?.data;
+  // Use Redux data for current user, API data for other users
+  const profile = isOwnProfile ? currentUser : profileData?.data;
   const chirps = chirpsData?.data || [];
   const followers = followersData?.data || [];
   const following = followingData?.data || [];
 
-  const isOwnProfile = currentUser?.id === userId;
+  // Show loading only when fetching other user's profile or when current user data is not available
+  const isLoading = isOwnProfile ? !currentUser : profileLoading;
 
   const handleFollowToggle = async () => {
     if (!isAuthenticated || !currentUser) {
@@ -70,7 +77,7 @@ const Profile = () => {
     }
   };
 
-  if (profileLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -148,7 +155,7 @@ const Profile = () => {
                   <div className="flex items-center gap-2">
                     <h1 className="text-2xl font-bold">{profile?.name || profile?.username}</h1>
                     {profile?.verified && (
-                      <Verified className="w-5 h-5 text-primary fill-current" />
+                      <VerifiedBadge className="w-5 h-5" />
                     )}
                   </div>
                   <p className="text-muted-foreground">@{profile?.username}</p>
@@ -173,10 +180,15 @@ const Profile = () => {
                       </a>
                     </div>
                   )}
-                  {profile?.joinedDate && (
+                  {(profile?.joinedDate || isOwnProfile) && (
                     <div className="flex items-center gap-1">
                       <CalendarDays className="w-4 h-4" />
-                      <span>Joined {new Date(profile.joinedDate).toLocaleDateString()}</span>
+                      <span>
+                        Joined {profile?.joinedDate 
+                          ? new Date(profile.joinedDate).toLocaleDateString()
+                          : new Date().toLocaleDateString()
+                        }
+                      </span>
                     </div>
                   )}
                 </div>

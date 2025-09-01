@@ -19,9 +19,9 @@ export const store = configureStore({
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
     })
-    .concat(authMiddleware)
-    .concat(networkMiddleware)
-    .concat(isDevelopment ? logger : []),
+      .concat(authMiddleware)
+      .concat(networkMiddleware)
+      .concat(isDevelopment ? logger : []),
   devTools: isDevelopment ? devToolsConfig : false,
 });
 

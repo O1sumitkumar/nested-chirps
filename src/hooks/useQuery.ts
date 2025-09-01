@@ -32,7 +32,6 @@ export const useChirps = () => {
   return useQuery({
     queryKey: ['chirps'],
     queryFn: getChirps,
-    refetchInterval: 30000, // Refetch every 30 seconds
   });
 };
 
@@ -53,7 +52,6 @@ export const useTrending = () => {
   return useQuery({
     queryKey: ['trending'],
     queryFn: getTrendingTopics,
-    refetchInterval: 60000, // Refetch every minute
   });
 };
 
@@ -90,7 +88,6 @@ export const useWhoToFollow = () => {
   return useQuery({
     queryKey: ['whoToFollow'],
     queryFn: getWhoToFollow,
-    refetchInterval: 300000, // Refetch every 5 minutes
   });
 };
 
@@ -113,57 +110,37 @@ export const useSearchChirps = (searchTerm: string) => {
 
 // Chirp interactions
 export const useLikeChirp = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
       likeChirp(chirpId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chirps'] });
-    },
   });
 };
 
 export const useUnlikeChirp = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
       unlikeChirp(chirpId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chirps'] });
-    },
   });
 };
 
 export const useRechirp = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
       rechirpChirp(chirpId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chirps'] });
-    },
   });
 };
 
 export const useUnrechirp = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
       unrechirpChirp(chirpId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chirps'] });
-    },
   });
 };
 
 export const useReplyToChirp = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ chirpId, content, userId }: { chirpId: string; content: string; userId: string }) => 
       replyToChirp(chirpId, content, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chirps'] });
-    },
   });
 };
 
@@ -190,46 +167,32 @@ export const useUpdateChirp = () => {
 };
 
 // User profile hooks
-export const useUserProfile = (userId: string) => {
+export const useUserProfile = (userId: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['userProfile', userId],
     queryFn: () => getUserProfile(userId),
-    enabled: !!userId,
+    enabled: options?.enabled !== undefined ? options.enabled : !!userId,
   });
 };
 
 export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, profileData }: { userId: string; profileData: any }) => 
       updateUserProfile(userId, profileData),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
-    },
   });
 };
 
 export const useFollowUser = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ followerId, followeeId }: { followerId: string; followeeId: string }) => 
       followUser(followerId, followeeId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['followers'] });
-      queryClient.invalidateQueries({ queryKey: ['following'] });
-    },
   });
 };
 
 export const useUnfollowUser = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ followerId, followeeId }: { followerId: string; followeeId: string }) => 
       unfollowUser(followerId, followeeId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['followers'] });
-      queryClient.invalidateQueries({ queryKey: ['following'] });
-    },
   });
 };
 
@@ -270,6 +233,5 @@ export const useNotifications = (userId: string) => {
     queryKey: ['notifications', userId],
     queryFn: () => getNotifications(userId),
     enabled: !!userId,
-    refetchInterval: 60000, // Refetch every minute
   });
 };

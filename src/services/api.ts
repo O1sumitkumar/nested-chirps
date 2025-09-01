@@ -1,4 +1,15 @@
-const API_BASE_URL = 'http://localhost:3000/ai-agent/query';
+import { API_CONFIG, buildApiUrl } from '@/lib/config';
+import type { User } from '@/store/slices/authSlice';
+
+const API_BASE_URL = buildApiUrl(API_CONFIG.ENDPOINTS.QUERY);
+
+// API Response Types
+export interface AuthResponse {
+  success: boolean;
+  data?: User;
+  token?: string;
+  message?: string;
+}
 
 export interface QueryRequest {
   query: string;
@@ -23,8 +34,9 @@ export const queryApi = async <T = any>(request: QueryRequest): Promise<T> => {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        dbUrl: 'mongodb://localhost:27017/chirps',
-        dbType: 'mongodb',
+        dbUrl: API_CONFIG.DEFAULT_DB.URL,
+        dbType: API_CONFIG.DEFAULT_DB.TYPE,
+        // refreshSchema: true,
         ...request,
       }),
     });
@@ -54,7 +66,7 @@ export const getUser = (username: string) =>
 export const createChirp = (content: string, userId: string) =>
   queryApi({ query: `Create new chirp with content: "${content}" for user: ${userId}` });
 
-export const authenticateUser = async (email: string, password: string) => {
+export const authenticateUser = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     // For development/testing - create a mock user if the API is not available
     const mockUser = {
@@ -70,7 +82,7 @@ export const authenticateUser = async (email: string, password: string) => {
 
     // Try the real API first
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.LOGIN), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +133,7 @@ export const authenticateUser = async (email: string, password: string) => {
   }
 };
 
-export const registerUser = async (email: string, password: string, username: string, name: string) => {
+export const registerUser = async (email: string, password: string, username: string, name: string): Promise<AuthResponse> => {
   try {
     // For development/testing - create a mock user if the API is not available
     const mockUser = {
@@ -135,7 +147,7 @@ export const registerUser = async (email: string, password: string, username: st
 
     // Try the real API first
     try {
-      const response = await fetch('http://localhost:3000/signup', {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.SIGNUP), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

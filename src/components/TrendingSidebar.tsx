@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, Users, MoreHorizontal, Verified } from "lucide-react";
+import { TrendingUp, Users, MoreHorizontal } from "lucide-react";
+import VerifiedBadge from "@/components/VerifiedBadge";
 import techNewsAvatar from "@/assets/avatars/tech-news.jpg";
 import designInspirationAvatar from "@/assets/avatars/design-inspiration.jpg";
 import startupStoriesAvatar from "@/assets/avatars/startup-stories.jpg";
@@ -68,7 +69,7 @@ const TrendingSidebar = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="font-semibold text-sm truncate">{user.name}</p>
-                  {user.verified && <Verified className="w-3 h-3 text-primary fill-current" />}
+                  {user.verified && <VerifiedBadge className="w-4 h-4" />}
                 </div>
                 <p className="text-muted-foreground text-sm">@{user.username}</p>
                 <p className="text-muted-foreground text-xs">{user.followers} followers</p>

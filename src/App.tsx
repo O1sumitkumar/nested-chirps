@@ -22,7 +22,16 @@ import Following from "./pages/Following";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 15 * 60 * 1000, // 15 minutes
+      gcTime: 20 * 60 * 1000, // 20 minutes (garbage collection time)
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 const AppContent = () => {
   useEffect(() => {

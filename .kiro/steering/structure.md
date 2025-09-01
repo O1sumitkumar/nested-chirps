@@ -1,70 +1,89 @@
-# Project Structure
+---
+inclusion: always
+---
 
-## Root Directory
-```
-├── src/                 # Source code
-├── public/              # Static assets (favicon, robots.txt)
-├── .kiro/               # Kiro configuration and steering
-├── node_modules/        # Dependencies
-├── package.json         # Project configuration
-├── vite.config.ts       # Vite build configuration
-├── tailwind.config.ts   # Tailwind CSS configuration
-├── components.json      # shadcn/ui configuration
-└── tsconfig.json        # TypeScript configuration
-```
+# Project Structure & Architecture
 
-## Source Structure (`src/`)
+## File Organization Rules
+
+### Path Aliases
+- Always use `@/` imports instead of relative paths
+- `@/components` for UI components
+- `@/pages` for route components
+- `@/hooks` for custom hooks
+- `@/lib` for utilities
+- `@/services` for API integration
+- `@/store` for Redux state management
+
+### Directory Structure
 ```
 src/
 ├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components (auto-generated)
-│   ├── ChirpCard.tsx   # Custom components for app features
-│   ├── ChirpComposer.tsx
-│   ├── Header.tsx
-│   └── ...
-├── pages/              # Route components (one per page)
-│   ├── Index.tsx       # Home/feed page
-│   ├── Login.tsx       # Authentication pages
-│   ├── Profile.tsx     # User profile pages
-│   └── ...
-├── store/              # Redux store and state management
-│   ├── slices/         # Redux slices (authSlice, uiSlice)
-│   ├── middleware/     # Custom middleware
-│   ├── selectors/      # Reusable selectors
-│   └── hooks.ts        # Typed Redux hooks
-├── hooks/              # Custom React hooks
-│   ├── use-toast.ts    # UI-related hooks
-│   └── useQuery.ts     # Data fetching hooks
-├── lib/                # Utility functions and configurations
-│   └── utils.ts        # Common utilities (cn, etc.)
-├── services/           # API and external service integrations
-│   └── api.ts          # API client and endpoints
-├── assets/             # Images, fonts, and other static files
-├── App.tsx             # Main app component with routing
-├── main.tsx            # React app entry point
-└── index.css           # Global styles and Tailwind imports
+│   ├── ui/             # shadcn/ui primitives (DO NOT modify manually)
+│   └── [Feature].tsx   # Custom components (ChirpCard, Header, etc.)
+├── pages/              # Route components (one component per route)
+├── hooks/              # Custom React hooks with 'use' prefix
+├── lib/                # Utilities and shared configurations
+├── services/           # API clients and external integrations
+├── store/              # Redux Toolkit store, slices, and selectors
+├── assets/             # Static files (images, fonts)
+├── App.tsx             # Main router and layout
+└── main.tsx            # Application entry point
 ```
 
 ## Naming Conventions
-- **Components**: PascalCase (e.g., `ChirpCard.tsx`)
-- **Pages**: PascalCase matching route names (e.g., `Profile.tsx`)
-- **Hooks**: camelCase with `use` prefix (e.g., `useQuery.ts`)
-- **Utilities**: camelCase (e.g., `utils.ts`)
-- **Files**: Use `.tsx` for React components, `.ts` for utilities
 
-## Component Organization
-- Place reusable UI components in `components/`
-- Keep shadcn/ui components in `components/ui/` (auto-managed)
-- Put page-specific components in `pages/`
-- Use custom hooks in `hooks/` for shared logic
-- Centralize API calls in `services/`
+### Files & Components
+- **React Components**: PascalCase with `.tsx` extension (`ChirpCard.tsx`)
+- **Pages**: PascalCase matching route names (`Profile.tsx`, `Login.tsx`)
+- **Hooks**: camelCase with `use` prefix (`useQuery.ts`, `useAuth.ts`)
+- **Utilities**: camelCase with `.ts` extension (`utils.ts`, `api.ts`)
+- **Types**: PascalCase with `Type` or `Interface` suffix
 
-## Routing Structure
-All routes defined in `App.tsx`:
-- `/` - Home feed
-- `/login`, `/signup` - Authentication
+### Code Patterns
+- Use functional components with hooks (no class components)
+- Prefer named exports over default exports for better refactoring
+- Use TypeScript interfaces for props and data structures
+- Implement proper error boundaries for component isolation
+
+## Architecture Patterns
+
+### Component Hierarchy
+1. **Pages** - Route-level components, handle data fetching and layout
+2. **Feature Components** - Business logic components (ChirpCard, ChirpComposer)
+3. **UI Components** - Reusable primitives from shadcn/ui library
+
+### State Management
+- **Redux Toolkit** for global application state
+- **TanStack Query** for server state and caching
+- **React Hook Form** for form state management
+- Local component state for UI-only concerns
+
+### Data Flow
+- Pages fetch data using TanStack Query hooks
+- Global state managed through Redux slices
+- Props flow down, events bubble up
+- Use custom hooks to encapsulate complex logic
+
+## Development Guidelines
+
+### Component Creation
+- Keep components focused on single responsibility
+- Extract reusable logic into custom hooks
+- Use proper TypeScript typing for all props and state
+- Implement proper loading and error states
+
+### Import Organization
+1. React and external libraries
+2. Internal components (using `@/` aliases)
+3. Types and interfaces
+4. Relative imports (only when necessary)
+
+### Routing Structure
+All routes defined in `App.tsx` using React Router:
+- `/` - Home feed (Index.tsx)
+- `/login`, `/signup` - Authentication pages
 - `/explore` - Content discovery
 - `/profile/:userId` - User profiles
 - `/chirp/:chirpId` - Individual chirp view
 - `/notifications` - User notifications
-- `*` - 404 Not Found (catch-all)
