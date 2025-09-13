@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { store } from "@/store";
 import { initializeAuth } from "@/store/slices/authSlice";
 import { setOnlineStatus } from "@/store/slices/uiSlice";
+import { setupGlobalFetchInterceptor } from "@/services/fetchWrapper";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import AuthDebug from "@/components/AuthDebug";
@@ -35,6 +36,9 @@ const queryClient = new QueryClient({
 
 const AppContent = () => {
   useEffect(() => {
+    // Setup global fetch interceptor for 401 handling
+    setupGlobalFetchInterceptor();
+
     // Initialize auth state from localStorage
     store.dispatch(initializeAuth());
 

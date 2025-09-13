@@ -141,8 +141,24 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.token = null;
       state.error = null;
+      state.isLoading = false;
+      
+      // Clear all localStorage items
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      
+      // Clear any additional app-specific localStorage items
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('app_') || key.startsWith('chirp_') || key.startsWith('user_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Clear sessionStorage as well
+      sessionStorage.clear();
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
@@ -159,8 +175,23 @@ const authSlice = createSlice({
       state.token = null;
       state.error = null;
       state.isLoading = false;
+      
+      // Clear all localStorage items
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      
+      // Clear any additional app-specific localStorage items
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('app_') || key.startsWith('chirp_') || key.startsWith('user_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Clear sessionStorage as well
+      sessionStorage.clear();
     },
   },
   extraReducers: (builder) => {

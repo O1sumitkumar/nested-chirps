@@ -14,11 +14,23 @@ export const authMiddleware: Middleware<{}, RootState> = (store) => (next) => (a
   }
 
   if (action.type === 'auth/logout') {
+    // Clear all authentication data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
+    // Clear any additional app-specific localStorage items
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('app_') || key.startsWith('chirp_') || key.startsWith('user_'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Clear sessionStorage as well
+    sessionStorage.clear();
   }
-
-
 
   return result;
 };

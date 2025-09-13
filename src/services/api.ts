@@ -1,5 +1,6 @@
 import { API_CONFIG, buildApiUrl } from '@/lib/config';
 import type { User } from '@/store/slices/authSlice';
+import { apiInterceptor } from './apiInterceptor';
 
 const API_BASE_URL = buildApiUrl(API_CONFIG.ENDPOINTS.QUERY);
 
@@ -41,11 +42,8 @@ export const queryApi = async <T = any>(request: QueryRequest): Promise<T> => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    // Use the interceptor to handle 401 responses
+    const data = await apiInterceptor.handleResponse<T>(response);
     return data;
   } catch (error) {
     console.error('API query failed:', error);
@@ -112,7 +110,7 @@ export const authenticateUser = async (email: string, password: string): Promise
       });
 
       if (response.ok) {
-        const apiData = await response.json();
+        const apiData = await apiInterceptor.handleResponse(response) as any;
 
         // Transform API response to match our User interface
         const transformedUser = {
@@ -177,7 +175,7 @@ export const registerUser = async (email: string, password: string, username: st
       });
 
       if (response.ok) {
-        const apiData = await response.json();
+        const apiData = await apiInterceptor.handleResponse(response) as any;
 
         // Transform API response to match our User interface
         const transformedUser = {
