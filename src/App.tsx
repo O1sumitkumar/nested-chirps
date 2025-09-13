@@ -20,6 +20,7 @@ import ChirpDetail from "./pages/ChirpDetail";
 import Followers from "./pages/Followers";
 import Following from "./pages/Following";
 import Notifications from "./pages/Notifications";
+import Bookmarks from "./pages/Bookmarks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -101,7 +102,7 @@ const AppContent = () => {
         } />
         <Route path="/bookmarks" element={
           <ProtectedRoute>
-            <Index />
+            <Bookmarks />
           </ProtectedRoute>
         } />
         <Route path="/communities" element={

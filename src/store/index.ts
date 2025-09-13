@@ -13,15 +13,17 @@ export const store = configureStore({
     auth: authSlice,
     ui: uiSlice,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => {
+    const middleware = getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
     })
       .concat(authMiddleware)
-      .concat(networkMiddleware)
-      .concat(isDevelopment ? logger : []),
+      .concat(networkMiddleware);
+    
+    return isDevelopment ? middleware.concat(logger) : middleware;
+  },
   devTools: isDevelopment ? devToolsConfig : false,
 });
 

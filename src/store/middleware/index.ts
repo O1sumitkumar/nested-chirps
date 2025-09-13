@@ -1,8 +1,7 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { RootState } from '../index';
 
 // Custom middleware for handling auth token persistence
-export const authMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
+export const authMiddleware: Middleware = (store) => (next) => (action: any) => {
   const result = next(action);
 
   // Listen for auth actions and sync with localStorage
@@ -24,7 +23,7 @@ export const authMiddleware: Middleware<{}, RootState> = (store) => (next) => (a
 };
 
 // Network status middleware
-export const networkMiddleware: Middleware<{}, RootState> = () => (next) => (action: any) => {
+export const networkMiddleware: Middleware = () => (next) => (action: any) => {
   const result = next(action);
 
   // Handle network-related actions

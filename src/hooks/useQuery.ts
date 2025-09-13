@@ -25,6 +25,10 @@ import {
   getUserChirps,
   getChirpDetail,
   getNotifications,
+  markNotificationRead,
+  getBookmarkedChirps,
+  bookmarkChirp,
+  unbookmarkChirp,
   type CreateChirpPayload
 } from '@/services/api';
 
@@ -233,5 +237,36 @@ export const useNotifications = (userId: string) => {
     queryKey: ['notifications', userId],
     queryFn: () => getNotifications(userId),
     enabled: !!userId,
+  });
+};
+
+// Bookmarks
+export const useBookmarkedChirps = (userId: string) => {
+  return useQuery({
+    queryKey: ['bookmarkedChirps', userId],
+    queryFn: () => getBookmarkedChirps(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useBookmarkChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      bookmarkChirp(chirpId, userId),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['bookmarkedChirps', userId] });
+    },
+  });
+};
+
+export const useUnbookmarkChirp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chirpId, userId }: { chirpId: string; userId: string }) => 
+      unbookmarkChirp(chirpId, userId),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['bookmarkedChirps', userId] });
+    },
   });
 };
