@@ -80,7 +80,11 @@ const TrendingSidebar = () => {
             </div>
           ))}
         </div>
-        <Button variant="ghost" className="w-full mt-3 text-primary hover:bg-primary/10">
+        <Button 
+          variant="ghost" 
+          className="w-full mt-3 text-primary hover:bg-primary/10"
+          onClick={() => window.location.href = '/who-to-follow'}
+        >
           Show more
         </Button>
       </Card>

@@ -288,3 +288,17 @@ export const bookmarkChirp = (chirpId: string, userId: string) =>
 
 export const unbookmarkChirp = (chirpId: string, userId: string) =>
   queryApi({ query: `User ${userId} wants to remove bookmark from chirp ${chirpId}` });
+
+// Communities
+export const getCommunities = (userId: string) =>
+  queryApi({ query: `Get all communities for user ${userId} including joined and available communities` });
+
+export const joinCommunity = (communityId: string, userId: string) =>
+  queryApi({ query: `User ${userId} wants to join community ${communityId}` });
+
+export const leaveCommunity = (communityId: string, userId: string) =>
+  queryApi({ query: `User ${userId} wants to leave community ${communityId}` });
+
+// Extended who to follow
+export const getWhoToFollowExtended = (userId: string) =>
+  queryApi({ query: `Get extended who to follow suggestions for user ${userId} including trending and new users` });

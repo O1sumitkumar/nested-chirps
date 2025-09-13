@@ -22,6 +22,8 @@ import Followers from "./pages/Followers";
 import Following from "./pages/Following";
 import Notifications from "./pages/Notifications";
 import Bookmarks from "./pages/Bookmarks";
+import Communities from "./pages/Communities";
+import WhoToFollow from "./pages/WhoToFollow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -111,7 +113,12 @@ const AppContent = () => {
         } />
         <Route path="/communities" element={
           <ProtectedRoute>
-            <Index />
+            <Communities />
+          </ProtectedRoute>
+        } />
+        <Route path="/who-to-follow" element={
+          <ProtectedRoute>
+            <WhoToFollow />
           </ProtectedRoute>
         } />
 

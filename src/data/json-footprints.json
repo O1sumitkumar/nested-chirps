@@ -1,0 +1,286 @@
+{
+  "communities": {
+    "description": "API endpoint for community-related operations",
+    "endpoints": {
+      "getCommunities": {
+        "method": "GET",
+        "url": "/api/communities",
+        "query_example": "Get all communities for user {userId} including joined and available communities",
+        "response_example": [
+          {
+            "id": "comm_123",
+            "name": "Web Developers",
+            "description": "A community for web developers to share knowledge and connect",
+            "avatar": "https://example.com/avatars/webdev.jpg",
+            "memberCount": 1250,
+            "postCount": 456,
+            "tags": ["javascript", "react", "nodejs", "frontend"],
+            "isPrivate": false,
+            "isActive": true,
+            "createdAt": "2024-01-15T10:30:00Z",
+            "joinedAt": "2024-02-01T14:20:00Z",
+            "members": [
+              {
+                "id": "user_456",
+                "name": "John Doe",
+                "role": "admin"
+              }
+            ],
+            "recentActivity": {
+              "lastPostAt": "2024-12-01T09:15:00Z",
+              "weeklyPosts": 23
+            }
+          },
+          {
+            "id": "comm_456",
+            "name": "Design Inspiration",
+            "description": "Share and discover amazing design work from around the world",
+            "avatar": "https://example.com/avatars/design.jpg",
+            "memberCount": 890,
+            "postCount": 234,
+            "tags": ["design", "ui", "ux", "inspiration"],
+            "isPrivate": true,
+            "isActive": true,
+            "createdAt": "2024-03-10T16:45:00Z",
+            "members": []
+          }
+        ]
+      },
+      "joinCommunity": {
+        "method": "POST",
+        "url": "/api/communities/join",
+        "query_example": "User {userId} wants to join community {communityId}",
+        "request_body": {
+          "userId": "user_123",
+          "communityId": "comm_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Successfully joined community",
+          "joinedAt": "2024-12-13T10:30:00Z"
+        }
+      },
+      "leaveCommunity": {
+        "method": "DELETE",
+        "url": "/api/communities/leave",
+        "query_example": "User {userId} wants to leave community {communityId}",
+        "request_body": {
+          "userId": "user_123",
+          "communityId": "comm_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Successfully left community"
+        }
+      }
+    }
+  },
+  "whoToFollow": {
+    "description": "API endpoint for user discovery and follow suggestions",
+    "endpoints": {
+      "getWhoToFollowExtended": {
+        "method": "GET",
+        "url": "/api/users/suggestions",
+        "query_example": "Get extended who to follow suggestions for user {userId} including trending and new users",
+        "response_example": [
+          {
+            "id": "user_789",
+            "name": "Sarah Chen",
+            "username": "sarahchen",
+            "bio": "Frontend developer passionate about React and TypeScript. Building beautiful user experiences.",
+            "avatar": "https://example.com/avatars/sarah.jpg",
+            "verified": true,
+            "followersCount": 12500,
+            "followingCount": 890,
+            "mutualFollows": 5,
+            "isFollowing": false,
+            "category": "suggested",
+            "interests": ["react", "typescript", "frontend"],
+            "recentGrowth": 234,
+            "joinedAt": "2023-06-15T08:30:00Z",
+            "lastActiveAt": "2024-12-13T09:45:00Z"
+          },
+          {
+            "id": "user_101",
+            "name": "Alex Rodriguez",
+            "username": "alexdev",
+            "bio": "Full-stack developer and tech entrepreneur. Love building products that make a difference.",
+            "avatar": "https://example.com/avatars/alex.jpg",
+            "verified": false,
+            "followersCount": 8900,
+            "followingCount": 567,
+            "mutualFollows": 12,
+            "isFollowing": true,
+            "category": "trending",
+            "interests": ["nodejs", "python", "startup"],
+            "recentGrowth": 567,
+            "joinedAt": "2023-12-01T12:15:00Z",
+            "lastActiveAt": "2024-12-13T11:20:00Z"
+          },
+          {
+            "id": "user_202",
+            "name": "Maya Patel",
+            "username": "mayaui",
+            "bio": "UX designer focused on accessibility and inclusive design. Making the web better for everyone.",
+            "avatar": "https://example.com/avatars/maya.jpg",
+            "verified": false,
+            "followersCount": 150,
+            "followingCount": 45,
+            "mutualFollows": 0,
+            "isFollowing": false,
+            "category": "new",
+            "interests": ["ux", "accessibility", "design"],
+            "recentGrowth": 45,
+            "joinedAt": "2024-12-01T14:30:00Z",
+            "lastActiveAt": "2024-12-13T10:10:00Z"
+          }
+        ]
+      },
+      "followUser": {
+        "method": "POST",
+        "url": "/api/users/follow",
+        "query_example": "User {followerId} wants to follow user {followeeId}",
+        "request_body": {
+          "followerId": "user_123",
+          "followeeId": "user_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Successfully followed user",
+          "followedAt": "2024-12-13T10:30:00Z"
+        }
+      },
+      "unfollowUser": {
+        "method": "DELETE",
+        "url": "/api/users/unfollow",
+        "query_example": "User {followerId} wants to unfollow user {followeeId}",
+        "request_body": {
+          "followerId": "user_123",
+          "followeeId": "user_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Successfully unfollowed user"
+        }
+      }
+    }
+  },
+  "bookmarks": {
+    "description": "API endpoint for bookmark-related operations",
+    "endpoints": {
+      "getBookmarkedChirps": {
+        "method": "GET",
+        "url": "/api/bookmarks",
+        "query_example": "Get all bookmarked chirps for user {userId}",
+        "response_example": [
+          {
+            "id": "chirp_123",
+            "_id": "chirp_123",
+            "content": "Just shipped a new feature! React Server Components are amazing for performance.",
+            "mediaUrl": "https://example.com/media/feature-demo.mp4",
+            "author": {
+              "id": "user_456",
+              "name": "John Developer",
+              "username": "johndev",
+              "avatar": "https://example.com/avatars/john.jpg",
+              "verified": true
+            },
+            "createdAt": "2024-12-12T15:30:00Z",
+            "likes": 45,
+            "rechirps": 12,
+            "replies": 8,
+            "bookmarkedAt": "2024-12-13T09:15:00Z"
+          },
+          {
+            "id": "chirp_456",
+            "_id": "chirp_456",
+            "content": "Great article on TypeScript best practices. Really helped me understand advanced types better!",
+            "mediaUrl": null,
+            "author": {
+              "id": "user_789",
+              "name": "Sarah Chen",
+              "username": "sarahchen",
+              "avatar": "https://example.com/avatars/sarah.jpg",
+              "verified": false
+            },
+            "createdAt": "2024-12-11T10:45:00Z",
+            "likes": 23,
+            "rechirps": 5,
+            "replies": 3,
+            "bookmarkedAt": "2024-12-12T14:20:00Z"
+          }
+        ]
+      },
+      "bookmarkChirp": {
+        "method": "POST",
+        "url": "/api/bookmarks/add",
+        "query_example": "User {userId} wants to bookmark chirp {chirpId}",
+        "request_body": {
+          "userId": "user_123",
+          "chirpId": "chirp_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Chirp bookmarked successfully",
+          "bookmarkedAt": "2024-12-13T10:30:00Z"
+        }
+      },
+      "unbookmarkChirp": {
+        "method": "DELETE",
+        "url": "/api/bookmarks/remove",
+        "query_example": "User {userId} wants to remove bookmark from chirp {chirpId}",
+        "request_body": {
+          "userId": "user_123",
+          "chirpId": "chirp_456"
+        },
+        "response_example": {
+          "success": true,
+          "message": "Bookmark removed successfully"
+        }
+      }
+    }
+  },
+  "followers": {
+    "description": "API endpoint for follower/following relationships",
+    "endpoints": {
+      "getFollowers": {
+        "method": "GET",
+        "url": "/api/users/{userId}/followers",
+        "query_example": "Get all followers for user {userId}",
+        "response_example": [
+          {
+            "id": "user_123",
+            "name": "John Doe",
+            "username": "johndoe",
+            "bio": "Software engineer and coffee enthusiast",
+            "avatar": "https://example.com/avatars/john.jpg",
+            "verified": false,
+            "followersCount": 234,
+            "followingCount": 189,
+            "isFollowing": false,
+            "followedAt": "2024-12-01T10:30:00Z"
+          }
+        ]
+      },
+      "getFollowing": {
+        "method": "GET",
+        "url": "/api/users/{userId}/following",
+        "query_example": "Get all users that user {userId} is following",
+        "response_example": [
+          {
+            "id": "user_456",
+            "name": "Jane Smith",
+            "username": "janesmith",
+            "bio": "Product manager building the future of social media",
+            "avatar": "https://example.com/avatars/jane.jpg",
+            "verified": true,
+            "followersCount": 1250,
+            "followingCount": 345,
+            "isFollowing": true,
+            "followedAt": "2024-11-15T14:20:00Z"
+          }
+        ]
+      }
+    }
+  }
+}

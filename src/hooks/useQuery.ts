@@ -29,6 +29,10 @@ import {
   getBookmarkedChirps,
   bookmarkChirp,
   unbookmarkChirp,
+  getCommunities,
+  joinCommunity,
+  leaveCommunity,
+  getWhoToFollowExtended,
   type CreateChirpPayload
 } from '@/services/api';
 
@@ -268,5 +272,45 @@ export const useUnbookmarkChirp = () => {
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ['bookmarkedChirps', userId] });
     },
+  });
+};
+
+// Communities
+export const useCommunities = (userId: string) => {
+  return useQuery({
+    queryKey: ['communities', userId],
+    queryFn: () => getCommunities(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useJoinCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ communityId, userId }: { communityId: string; userId: string }) => 
+      joinCommunity(communityId, userId),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['communities', userId] });
+    },
+  });
+};
+
+export const useLeaveCommunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ communityId, userId }: { communityId: string; userId: string }) => 
+      leaveCommunity(communityId, userId),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['communities', userId] });
+    },
+  });
+};
+
+// Extended who to follow
+export const useWhoToFollowExtended = (userId: string) => {
+  return useQuery({
+    queryKey: ['whoToFollowExtended', userId],
+    queryFn: () => getWhoToFollowExtended(userId),
+    enabled: !!userId,
   });
 };
