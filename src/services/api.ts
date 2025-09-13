@@ -279,3 +279,12 @@ export const getNotifications = (userId: string) =>
 
 export const markNotificationRead = (notificationId: string) =>
   queryApi({ query: `Mark notification ${notificationId} as read` });
+
+export const getBookmarkedChirps = (userId: string) =>
+  queryApi({ query: `Get all bookmarked chirps for user ${userId}` });
+
+export const bookmarkChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `User ${userId} wants to bookmark chirp ${chirpId}` });
+
+export const unbookmarkChirp = (chirpId: string, userId: string) =>
+  queryApi({ query: `User ${userId} wants to remove bookmark from chirp ${chirpId}` });

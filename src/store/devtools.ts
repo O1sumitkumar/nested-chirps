@@ -4,7 +4,7 @@ export const devToolsConfig: DevToolsEnhancerOptions = {
   name: 'ChirpNest App',
   trace: true,
   traceLimit: 25,
-  actionSanitizer: (action) => {
+  actionSanitizer: (action: any) => {
     // Sanitize sensitive data in actions
     if (action.type?.includes('login') || action.type?.includes('register')) {
       return {
@@ -14,7 +14,7 @@ export const devToolsConfig: DevToolsEnhancerOptions = {
     }
     return action;
   },
-  stateSanitizer: (state) => {
+  stateSanitizer: (state: any) => {
     // Sanitize sensitive data in state
     return {
       ...state,
