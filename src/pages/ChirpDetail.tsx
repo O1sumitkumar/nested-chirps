@@ -11,6 +11,7 @@ import { useChirpDetail, useReplyToChirp } from "@/hooks/useQuery";
 import { useAppSelector } from "@/store/hooks";
 import { selectCurrentUser, selectIsAuthenticated } from "@/store/selectors";
 import { useToast } from "@/hooks/use-toast";
+import type { CreateChirpPayload } from "@/services/api";
 
 const ChirpDetail = () => {
   const { chirpId } = useParams<{ chirpId: string }>();
@@ -22,8 +23,14 @@ const ChirpDetail = () => {
   const { data: chirpData, isLoading } = useChirpDetail(chirpId!);
   const replyMutation = useReplyToChirp();
 
-  const chirp = chirpData?.data;
+  // Handle the API response structure - data is an array with one chirp
+  const chirp = chirpData?.data?.[0];
   const replies = chirp?.replies || [];
+
+  // Debug logging
+  console.log('ChirpDetail - chirpData:', chirpData);
+  console.log('ChirpDetail - chirp:', chirp);
+  console.log('ChirpDetail - replies:', replies);
 
   const handleReply = async () => {
     if (!isAuthenticated || !user) {
@@ -38,11 +45,30 @@ const ChirpDetail = () => {
     if (!replyText.trim()) return;
 
     try {
-      await replyMutation.mutateAsync({
-        chirpId: chirpId!,
-        content: replyText,
-        userId: user.id,
-      });
+      // Extract hashtags and mentions from content
+      const hashtags = (replyText.match(/#\w+/g) || []).map(tag => tag.substring(1));
+      const mentions = (replyText.match(/@\w+/g) || []).map(mention => mention.substring(1));
+      
+      // Create reply payload matching backend structure
+      const replyPayload: CreateChirpPayload & { parentchirpid: string; threadid: string } = {
+        userid: user.id,
+        username: user.username || 'user',
+        displayname: user.name || 'User',
+        handle: `@${user.username || 'user'}`,
+        avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username || 'user'}`,
+        isverified: user.verified || false,
+        content: replyText.trim(),
+        mediaurls: [],
+        hashtags,
+        mentions,
+        location: null,
+        visibility: 'public',
+        isreply: true,
+        parentchirpid: chirpId!,
+        threadid: chirp?.threadId || chirpId!,
+      };
+
+      await replyMutation.mutateAsync(replyPayload);
       
       setReplyText("");
       toast({
@@ -50,6 +76,7 @@ const ChirpDetail = () => {
         description: "Your reply has been added to the conversation.",
       });
     } catch (error) {
+      console.error('Reply creation error:', error);
       toast({
         title: "Failed to post reply",
         description: "Something went wrong. Please try again.",
@@ -152,7 +179,7 @@ const ChirpDetail = () => {
                     <span className="text-muted-foreground">Likes</span>
                   </div>
                   <div className="flex gap-1">
-                    <span className="font-semibold">{chirp.replies || 0}</span>
+                    <span className="font-semibold">{Array.isArray(chirp.replies) ? chirp.replies.length : (chirp.replies || 0)}</span>
                     <span className="text-muted-foreground">Replies</span>
                   </div>
                 </div>

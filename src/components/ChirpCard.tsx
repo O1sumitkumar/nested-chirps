@@ -148,7 +148,7 @@ const ChirpCard = ({
   const timestampResolved = timestamp ?? createdAt ?? '';
   const likesResolved = likes ?? 0;
   const rechirpsResolved = rechirps ?? 0;
-  const repliesResolved = replies ?? 0;
+  const repliesResolved = Array.isArray(replies) ? replies.length : (replies ?? 0);
   return (
     <Card className="p-4 border-border/50 hover:bg-muted/20 transition-colors">
       <div className="flex gap-3">

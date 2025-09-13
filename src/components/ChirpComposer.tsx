@@ -9,6 +9,7 @@ import { useAppSelector } from "@/store/hooks";
 import { selectIsAuthenticated, selectCurrentUser } from "@/store/selectors";
 import { useCreateChirp } from "@/hooks/useQuery";
 import { useToast } from "@/hooks/use-toast";
+import type { CreateChirpPayload } from "@/services/api";
 
 const ChirpComposer = () => {
   const [chirpText, setChirpText] = useState("");
@@ -31,10 +32,30 @@ const ChirpComposer = () => {
     if (!chirpText.trim()) return;
 
     try {
-      await createChirpMutation.mutateAsync({
-        content: chirpText,
-        userId: user.id,
-      });
+      // Extract hashtags and mentions from content
+      const hashtags = (chirpText.match(/#\w+/g) || []).map(tag => tag.substring(1));
+      const mentions = (chirpText.match(/@\w+/g) || []).map(mention => mention.substring(1));
+      
+      // Create payload matching backend structure
+      const payload: CreateChirpPayload = {
+        userid: user.id,
+        username: user.username || 'user',
+        displayname: user.name || 'User',
+        handle: `@${user.username || 'user'}`,
+        avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username || 'user'}`,
+        isverified: user.verified || false,
+        content: chirpText.trim(),
+        mediaurls: [], // TODO: Add media upload functionality
+        hashtags,
+        mentions,
+        location: null, // TODO: Add location functionality
+        visibility: 'public',
+        isreply: false,
+        parentchirpid: null,
+        threadid: undefined,
+      };
+
+      await createChirpMutation.mutateAsync(payload);
       
       setChirpText("");
       toast({
@@ -42,6 +63,7 @@ const ChirpComposer = () => {
         description: "Your chirp has been shared with the world.",
       });
     } catch (error) {
+      console.error('Chirp creation error:', error);
       toast({
         title: "Failed to post chirp",
         description: "Something went wrong. Please try again.",

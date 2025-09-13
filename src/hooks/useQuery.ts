@@ -24,7 +24,8 @@ import {
   getFollowing,
   getUserChirps,
   getChirpDetail,
-  getNotifications
+  getNotifications,
+  type CreateChirpPayload
 } from '@/services/api';
 
 // Chirps
@@ -39,8 +40,7 @@ export const useCreateChirp = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ content, userId }: { content: string; userId: string }) => 
-      createChirp(content, userId),
+    mutationFn: (payload: CreateChirpPayload) => createChirp(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chirps'] });
     },
@@ -139,8 +139,8 @@ export const useUnrechirp = () => {
 
 export const useReplyToChirp = () => {
   return useMutation({
-    mutationFn: ({ chirpId, content, userId }: { chirpId: string; content: string; userId: string }) => 
-      replyToChirp(chirpId, content, userId),
+    mutationFn: (payload: CreateChirpPayload & { parentchirpid: string; threadid: string }) => 
+      replyToChirp(payload),
   });
 };
 

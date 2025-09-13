@@ -63,8 +63,29 @@ export const getTrendingTopics = () =>
 export const getUser = (username: string) =>
   queryApi({ query: `Get user profile for username: ${username}` });
 
-export const createChirp = (content: string, userId: string) =>
-  queryApi({ query: `Create new chirp with content: "${content}" for user: ${userId}` });
+// Chirp creation payload interface - matches backend format
+export interface CreateChirpPayload {
+  userid: string;
+  username: string;
+  displayname: string;
+  handle: string;
+  avatar: string;
+  isverified: boolean;
+  content: string;
+  mediaurls: string[];
+  hashtags: string[];
+  mentions: string[];
+  location?: string | null;
+  visibility: string;
+  isreply: boolean;
+  parentchirpid?: string | null;
+  threadid?: string;
+}
+
+export const createChirp = (payload: CreateChirpPayload) => {
+  const query = `create chirps with data: ${JSON.stringify(payload)}`;
+  return queryApi({ query });
+};
 
 export const authenticateUser = async (email: string, password: string): Promise<AuthResponse> => {
   try {
@@ -219,8 +240,10 @@ export const rechirpChirp = (chirpId: string, userId: string) =>
 export const unrechirpChirp = (chirpId: string, userId: string) =>
   queryApi({ query: `Remove retweet of chirp ${chirpId} by user ${userId}` });
 
-export const replyToChirp = (chirpId: string, content: string, userId: string) =>
-  queryApi({ query: `Reply to chirp ${chirpId} with content: "${content}" by user ${userId}` });
+export const replyToChirp = (payload: CreateChirpPayload & { parentchirpid: string; threadid: string }) => {
+  const query = `create chirps with data: ${JSON.stringify(payload)}`;
+  return queryApi({ query });
+};
 
 export const deleteChirp = (chirpId: string, userId: string) =>
   queryApi({ query: `Delete chirp ${chirpId} by user ${userId}` });

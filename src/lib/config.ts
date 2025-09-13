@@ -7,7 +7,7 @@ export const API_CONFIG = {
     SIGNUP: '/signup',
   },
   DEFAULT_DB: {
-    URL: import.meta.env.VITE_DB_URL || 'mongodb://localhost:27017/chirps',
+    URL: import.meta.env.VITE_LIVE_DB_URL || 'mongodb://localhost:27017/chirps',
     TYPE: import.meta.env.VITE_DB_TYPE || 'mongodb',
   },
 } as const;
