@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Formik, Form, Field, FieldProps } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,18 +9,15 @@ import { MessageCircle, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { registerUserAsync, selectIsLoading, selectAuthError, clearError } from "@/store/slices/authSlice";
 import { useToast } from "@/hooks/use-toast";
+import { signupValidationSchema, type SignupFormValues } from "@/lib/validationSchemas";
+import { FieldError } from "@/components/FieldError";
 import authBg from "@/assets/auth-bg.jpg";
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,11 +26,33 @@ const Signup = () => {
 
   useEffect(() => {
     if (error) {
-      toast({
-        title: "Registration failed",
-        description: error,
-        variant: "destructive",
-      });
+      // Parse backend error to extract field-specific errors
+      try {
+        const errorData = JSON.parse(error);
+        if (errorData.errors) {
+          const fieldErrors: Record<string, string> = {};
+          errorData.errors.forEach((err: any) => {
+            if (err.field) {
+              fieldErrors[err.field] = err.message;
+            }
+          });
+          setBackendErrors(fieldErrors);
+        } else {
+          // Generic error - show in toast
+          toast({
+            title: "Registration failed",
+            description: error,
+            variant: "destructive",
+          });
+        }
+      } catch {
+        // If error is not JSON, treat as generic error
+        toast({
+          title: "Registration failed",
+          description: error,
+          variant: "destructive",
+        });
+      }
       dispatch(clearError());
     }
   }, [error, toast, dispatch]);
@@ -47,41 +67,15 @@ const Signup = () => {
     return strength;
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-
-    if (field === 'password') {
-      setPasswordStrength(validatePassword(value));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password mismatch",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (passwordStrength < 3) {
-      toast({
-        title: "Weak password",
-        description: "Please choose a stronger password",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSubmit = async (values: SignupFormValues, { setSubmitting }: any) => {
+    setBackendErrors({}); // Clear previous backend errors
+    
     try {
       await dispatch(registerUserAsync({
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
+        name: values.fullName,
+        username: values.username,
+        email: values.email,
+        password: values.password,
       })).unwrap();
 
       toast({
@@ -89,8 +83,11 @@ const Signup = () => {
         description: "Welcome to ChirpNest! Please sign in.",
       });
       navigate('/login');
-    } catch (error) {
-      // Error is handled by useEffect above
+    } catch (error: any) {
+      // Backend errors are handled by useEffect above
+      console.error('Registration error:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -138,117 +135,159 @@ const Signup = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="John Doe"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    required
-                    className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
-                  />
-                </div>
+            <Formik
+              initialValues={{
+                fullName: "",
+                username: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+              }}
+              validationSchema={signupValidationSchema}
+              onSubmit={handleSubmit}
+              validateOnChange={true}
+              validateOnBlur={true}
+            >
+              {({ values, errors, touched, isSubmitting, setFieldValue }) => (
+                <Form className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Field name="fullName">
+                        {({ field }: FieldProps) => (
+                          <Input
+                            {...field}
+                            id="fullName"
+                            placeholder="John Doe"
+                            className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
+                          />
+                        )}
+                      </Field>
+                      <FieldError error={errors.fullName && touched.fullName ? errors.fullName : backendErrors.fullName} />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    placeholder="johndoe"
-                    value={formData.username}
-                    onChange={(e) => handleInputChange('username', e.target.value)}
-                    required
-                    className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                  className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a strong password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    required
-                    className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80 pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-
-                {formData.password && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
-                          style={{ width: `${(passwordStrength / 5) * 100}%` }}
-                        />
-                      </div>
-                      <span className={`text-xs font-medium ${passwordStrength >= 3 ? 'text-green-600' : passwordStrength >= 2 ? 'text-yellow-600' : 'text-destructive'}`}>
-                        {getPasswordStrengthText()}
-                      </span>
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Field name="username">
+                        {({ field }: FieldProps) => (
+                          <Input
+                            {...field}
+                            id="username"
+                            placeholder="johndoe"
+                            className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
+                          />
+                        )}
+                      </Field>
+                      <FieldError error={errors.username && touched.username ? errors.username : backendErrors.username} />
                     </div>
                   </div>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    required
-                    className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80 pr-10"
-                  />
-                  {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                    <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
-                  )}
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Field name="email">
+                      {({ field }: FieldProps) => (
+                        <Input
+                          {...field}
+                          id="email"
+                          type="email"
+                          placeholder="john@example.com"
+                          className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80"
+                        />
+                      )}
+                    </Field>
+                    <FieldError error={errors.email && touched.email ? errors.email : backendErrors.email} />
+                  </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create account"
-                )}
-              </Button>
-            </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Field name="password">
+                        {({ field }: FieldProps) => (
+                          <Input
+                            {...field}
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Create a strong password"
+                            className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80 pr-10"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setPasswordStrength(validatePassword(e.target.value));
+                            }}
+                          />
+                        )}
+                      </Field>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+
+                    {values.password && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
+                              style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-medium ${passwordStrength >= 3 ? 'text-green-600' : passwordStrength >= 2 ? 'text-yellow-600' : 'text-destructive'}`}>
+                            {getPasswordStrengthText()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    <FieldError error={errors.password && touched.password ? errors.password : backendErrors.password} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <div className="relative">
+                      <Field name="confirmPassword">
+                        {({ field }: FieldProps) => (
+                          <Input
+                            {...field}
+                            id="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirm your password"
+                            className="bg-background/50 border-border/60 focus:border-primary/50 focus:bg-background/80 pr-10"
+                          />
+                        )}
+                      </Field>
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      {values.confirmPassword && values.password === values.confirmPassword && (
+                        <Check className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+                      )}
+                    </div>
+                    <FieldError error={errors.confirmPassword && touched.confirmPassword ? errors.confirmPassword : backendErrors.confirmPassword} />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
+                    disabled={isSubmitting || isLoading}
+                  >
+                    {isSubmitting || isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create account"
+                    )}
+                  </Button>
+                </Form>
+              )}
+            </Formik>
 
             <div className="text-center">
               <div className="text-sm text-muted-foreground">
