@@ -37,9 +37,12 @@ const Bookmarks = () => {
     );
   }
 
+  // Ensure bookmarkedChirps is always an array
+  const chirpsArray = Array.isArray(bookmarkedChirps) ? bookmarkedChirps : [];
+  
   const filteredChirps = activeTab === 'media' 
-    ? bookmarkedChirps?.filter(chirp => chirp.mediaUrl) || []
-    : bookmarkedChirps || [];
+    ? chirpsArray.filter(chirp => chirp.mediaUrl) 
+    : chirpsArray;
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +55,7 @@ const Bookmarks = () => {
             <h1 className="text-2xl font-bold text-foreground">Bookmarks</h1>
           </div>
           <p className="text-muted-foreground text-sm mb-4">
-            {bookmarkedChirps?.length || 0} bookmarked chirps
+            {chirpsArray.length} bookmarked chirps
           </p>
           
           {/* Tab Navigation */}
